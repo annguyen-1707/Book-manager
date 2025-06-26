@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Books</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 20px;
+        }
+        .book-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .book-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .book-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .book-info {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .book-isbn {
+            color: #007bff;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .authors-section {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        .authors-title {
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        .author-tag {
+            display: inline-block;
+            background-color: #e9ecef;
+            color: #495057;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            margin: 2px;
+        }
+        .book-id {
+            color: #999;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+        .nav-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Books</h1>
+            <a href="/books/form" class="btn">Add New Book</a>
+        </div>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        
+        <!-- Books List -->
+        <div th:if="${not #lists.isEmpty(books)}" class="books-grid">
+            <div th:each="book : ${books}" class="book-card">
+                <div class="book-title" th:text="${book.name}">Book Title</div>
+                <div class="book-isbn" th:text="'ISBN: ' + ${book.isBn}">ISBN</div>
+                
+                <div class="book-info" th:if="${book.year != null}">
+                    <strong>Publication Year:</strong> 
+                    <span th:text="${#temporals.format(book.year, 'dd/MM/yyyy')}">Year</span>
+                </div>
+                
+                <div class="book-info" th:if="${book.reprint > 0}">
+                    <strong>Reprint:</strong> 
+                    <span th:text="${book.reprint}">Reprint</span>
+                </div>
+                
+                <div class="authors-section" th:if="${not #lists.isEmpty(book.authors)}">
+                    <div class="authors-title">Authors:</div>
+                    <div th:each="author : ${book.authors}" class="author-tag" th:text="${author.name}">Author Name</div>
+                </div>
+                
+                <div class="book-id">ID: <span th:text="${book.id}">ID</span></div>
+            </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(books)}" class="empty-state">
+            <h3>No Books Found</h3>
+            <p>There are no books in the system yet.</p>
+            <a href="/books/form" class="btn">Add Your First Book</a>
+        </div>
+        
+        <!-- Navigation Links -->
+        <div class="nav-links">
+            <a href="/authors">View Authors</a>
+            <a href="/authors/form">Add Author</a>
+            <a href="/">Home</a>
+        </div>
+    </div>
+</body>
+</html> 

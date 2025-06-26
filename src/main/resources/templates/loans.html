@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Loans</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn-success {
+            background-color: #28a745;
+        }
+        .btn-success:hover {
+            background-color: #1e7e34;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .loans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+            gap: 20px;
+        }
+        .loan-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .loan-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .loan-card.overdue {
+            border-left: 4px solid #dc3545;
+            background-color: #fff5f5;
+        }
+        .loan-card.returned {
+            border-left: 4px solid #28a745;
+            background-color: #f8fff8;
+        }
+        .loan-card.unknown {
+            border-left: 4px solid #6c757d;
+            background-color: #f8f9fa;
+        }
+        .book-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .borrower-info {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .loan-dates {
+            margin: 15px 0;
+            padding: 10px;
+            background-color: #e9ecef;
+            border-radius: 4px;
+        }
+        .date-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        .status-active {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-overdue {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .status-returned {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .status-unknown {
+            background-color: #f8f9fa;
+            color: #6c757d;
+        }
+        .actions {
+            margin-top: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+        .nav-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 th:text="${title != null ? title : 'All Loans'}">Loans</h1>
+            <a href="/loans/form" class="btn">Borrow Book</a>
+        </div>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+        
+        <!-- Loans List -->
+        <div th:if="${not #lists.isEmpty(loans)}" class="loans-grid">
+            <div th:each="loan : ${loans}" 
+                 th:class="'loan-card ' + ${loan.status != null ? loan.status.toLowerCase() : 'unknown'}">
+                <div class="book-title" th:text="${loan.book.name}">Book Title</div>
+                <div class="borrower-info">
+                    <strong>Borrower:</strong> <span th:text="${loan.borrowerName}">Borrower Name</span>
+                </div>
+                <div class="borrower-info" th:if="${loan.borrowerEmail != null and !loan.borrowerEmail.isEmpty()}">
+                    <strong>Email:</strong> <span th:text="${loan.borrowerEmail}">Email</span>
+                </div>
+                
+                <div class="status-badge" 
+                     th:class="'status-badge status-' + ${loan.status != null ? loan.status.toLowerCase() : 'unknown'}"
+                     th:text="${loan.status != null ? loan.status : 'Unknown'}">Status</div>
+                
+                <div class="loan-dates">
+                    <div class="date-item">
+                        <span>Issue Date:</span>
+                        <span th:text="${loan.issueDate}">Issue Date</span>
+                    </div>
+                    <div class="date-item">
+                        <span>Due Date:</span>
+                        <span th:text="${loan.dueDate}">Due Date</span>
+                    </div>
+                    <div class="date-item" th:if="${loan.returnDate != null}">
+                        <span>Return Date:</span>
+                        <span th:text="${loan.returnDate}">Return Date</span>
+                    </div>
+                </div>
+                
+                <div class="actions" th:if="${loan.status == 'ACTIVE'}">
+                    <form th:action="@{/loans/{id}/return(id=${loan.id})}" method="post" style="display: inline;">
+                        <button type="submit" class="btn btn-success">Return Book</button>
+                    </form>
+                </div>
+                
+                <div class="loan-id">ID: <span th:text="${loan.id}">ID</span></div>
+            </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(loans)}" class="empty-state">
+            <h3>No Loans Found</h3>
+            <p>There are no loans in the system yet.</p>
+            <a href="/loans/form" class="btn">Borrow Your First Book</a>
+        </div>
+        
+        <!-- Navigation Links -->
+        <div class="nav-links">
+            <a href="/books">View Books</a>
+            <a href="/authors">View Authors</a>
+            <a href="/">Home</a>
+        </div>
+    </div>
+</body>
+</html> 

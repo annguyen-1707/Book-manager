@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Borrow Book</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        h2 {
+            color: #333;
+            margin: 0;
+        }
+        .btn {
+            background-color: #6c757d;
+            color: white;
+            padding: 8px 16px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background-color: #545b62;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input[type="text"], input[type="email"], input[type="date"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        input[type="text"]:focus, input[type="email"]:focus, input[type="date"]:focus, select:focus {
+            outline: none;
+            border-color: #007bff;
+            box-shadow: 0 0 5px rgba(0,123,255,0.3);
+        }
+        .submit-btn {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+        .submit-btn:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .required {
+            color: #dc3545;
+        }
+        .help-text {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .book-info {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            border-left: 4px solid #007bff;
+        }
+        .book-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .book-details {
+            color: #666;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Borrow Book</h2>
+            <a href="/loans" class="btn">Back to Loans</a>
+        </div>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-error" th:text="${errorMessage}"></div>
+
+        <form th:action="@{/loans}" th:object="${loan}" method="post">
+            <input type="hidden" th:field="*{id}" />
+
+            <div class="form-group">
+                <label for="bookId">Select Book: <span class="required">*</span></label>
+                <select id="bookId" th:field="*{bookId}" required>
+                    <option value="">-- Select a book to borrow --</option>
+                    <option th:each="book : ${availableBooks}" 
+                            th:value="${book.bookId}" 
+                            th:text="${book.book.name + ' (ISBN: ' + book.book.isBn + ')'}">
+                        Book Name (ISBN)
+                    </option>
+                </select>
+                <div class="help-text">Choose a book that is currently available for borrowing</div>
+            </div>
+
+            <div class="form-group">
+                <label for="borrowerName">Borrower Name: <span class="required">*</span></label>
+                <input type="text" id="borrowerName" th:field="*{borrowerName}" required 
+                       placeholder="Enter borrower's full name" />
+                <div class="help-text">Enter the full name of the person borrowing the book</div>
+            </div>
+
+            <div class="form-group">
+                <label for="borrowerEmail">Borrower Email:</label>
+                <input type="email" id="borrowerEmail" th:field="*{borrowerEmail}" 
+                       placeholder="Enter borrower's email address" />
+                <div class="help-text">Enter the email address for loan notifications (optional)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="issueDate">Issue Date: <span class="required">*</span></label>
+                <input type="date" id="issueDate" th:field="*{issueDate}" required 
+                       th:value="${today}" />
+                <div class="help-text">The date when the book is being borrowed (defaults to today)</div>
+            </div>
+
+            <div class="form-group">
+                <label for="dueDate">Due Date: <span class="required">*</span></label>
+                <input type="date" id="dueDate" th:field="*{dueDate}" required 
+                       th:value="${defaultDueDate}" />
+                <div class="help-text">The date when the book should be returned (defaults to 2 weeks from today)</div>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="submit-btn">Borrow Book</button>
+            </div>
+        </form>
+        
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="/loans" style="color: #007bff; text-decoration: none;">← Back to Loans List</a>
+        </div>
+    </div>
+</body>
+</html> 

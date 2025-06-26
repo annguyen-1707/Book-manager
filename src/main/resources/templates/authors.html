@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Authors</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #eee;
+        }
+        h1 {
+            color: #333;
+            margin: 0;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .alert {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .authors-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        .author-card {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .author-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+        .author-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .author-info {
+            color: #666;
+            margin-bottom: 5px;
+        }
+        .author-id {
+            color: #999;
+            font-size: 12px;
+        }
+        .empty-state {
+            text-align: center;
+            color: #666;
+            font-style: italic;
+            padding: 40px;
+        }
+        .nav-links {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .nav-links a {
+            color: #007bff;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        .nav-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Authors</h1>
+            <a href="/authors/form" class="btn">Add New Author</a>
+        </div>
+        
+        <!-- Success/Error Messages -->
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        
+        <!-- Authors List -->
+        <div th:if="${not #lists.isEmpty(authors)}" class="authors-grid">
+            <div th:each="author : ${authors}" class="author-card">
+                <div class="author-name" th:text="${author.name}">Author Name</div>
+                <div class="author-info" th:if="${author.dateOfBirth != null}">
+                    <strong>Birth Date:</strong> 
+                    <span th:text="${#temporals.format(author.dateOfBirth, 'dd/MM/yyyy')}">Birth Date</span>
+                </div>
+                <div class="author-info" th:if="${author.address != null and !author.address.isEmpty()}">
+                    <strong>Address:</strong> 
+                    <span th:text="${author.address}">Address</span>
+                </div>
+                <div class="author-id">ID: <span th:text="${author.id}">ID</span></div>
+            </div>
+        </div>
+        
+        <!-- Empty State -->
+        <div th:if="${#lists.isEmpty(authors)}" class="empty-state">
+            <h3>No Authors Found</h3>
+            <p>There are no authors in the system yet.</p>
+            <a href="/authors/form" class="btn">Add Your First Author</a>
+        </div>
+        
+        <!-- Navigation Links -->
+        <div class="nav-links">
+            <a href="/books">View Books</a>
+            <a href="/books/form">Add Book</a>
+            <a href="/">Home</a>
+        </div>
+    </div>
+</body>
+</html> 
